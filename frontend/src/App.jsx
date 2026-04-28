@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import './App.css'
 
-const API_URL = 'https://iam-kb-production.up.railway.app/query'
+const API_URL = 'https://web-production-13995.up.railway.app/query'
 
 const SUGGESTED = [
   'SAP posting error CORM month close solution',
