@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "Bash(py *)",
+      "PowerShell(py *)",
+      "PowerShell(head *)",
+      "PowerShell(Get-Command *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(cmd /c \"dir C:\\\\Users\\\\Krit\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\")",
+      "PowerShell(& \"C:\\\\Users\\\\Krit\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\" \"C:\\\\Users\\\\Krit\\\\Coding Projects\\\\IAM-KB\\\\sync_obsidian.py\")",
+      "PowerShell(cmd /c \"dir C:\\\\Users\\\\Krit\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Launcher\")",
+      "PowerShell(& \"C:\\\\Users\\\\Krit\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Launcher\\\\py.exe\" \"C:\\\\Users\\\\Krit\\\\Coding Projects\\\\IAM-KB\\\\sync_obsidian.py\")",
+      "PowerShell(& \"C:\\\\Users\\\\Krit\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\" --version)",
+      "PowerShell($python = \"C:\\\\Users\\\\Krit\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\"; Set-Location \"C:\\\\Users\\\\Krit\\\\Coding Projects\\\\IAM-KB\"; & $python -m venv venv; Write-Host \"venv created\")",
+      "PowerShell(Get-Content \"C:\\\\Users\\\\Krit\\\\Coding Projects\\\\IAM-KB\\\\.env\" | ForEach-Object { \\($_ -split '='\\)[0] })",
+      "Skill(claude-api)",
+      "Bash(.\\\\venv\\\\Scripts\\\\pip.exe install *)",
+      "PowerShell(Invoke-RestMethod -Uri http://localhost:8000/health -Method GET)",
+      "PowerShell(npm create *)",
+      "Bash(Select-String \".\")",
+      "Bash(Select-Object -First 20)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "& \"C:\\Users\\Krit\\AppData\\Local\\Programs\\Python\\Launcher\\py.exe\" \"C:\\Users\\Krit\\Coding Projects\\IAM-KB\\sync_obsidian.py\"",
+            "shell": "powershell",
+            "timeout": 30,
+            "statusMessage": "Syncing CLAUDE.md from Obsidian..."
+          }
+        ]
+      }
+    ]
+  }
+}
