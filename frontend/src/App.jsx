@@ -20,10 +20,10 @@ function LoginOverlay({ onLogin }) {
     setError('')
     const token = btoa(`${user}:${pass}`)
     try {
-      const res = await fetch(API_URL.replace('/query', '/health'), {
+      const res = await fetch(API_URL.replace('/query', '/auth'), {
         headers: { Authorization: `Basic ${token}` },
       })
-      if (res.ok || res.status === 404) {
+      if (res.ok) {
         sessionStorage.setItem('kb_auth', token)
         onLogin(token)
       } else {

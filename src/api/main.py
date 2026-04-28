@@ -51,6 +51,11 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/auth")
+def auth_check(_: HTTPBasicCredentials = Depends(verify)):
+    return {"status": "ok"}
+
+
 @app.post("/query")
 def query(req: QueryRequest, _: HTTPBasicCredentials = Depends(verify)):
     """
