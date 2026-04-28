@@ -1,7 +1,71 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import './App.css'
 
 const API_URL = 'https://web-production-13995.up.railway.app/query'
+
+function getStoredAuth() {
+  try { return sessionStorage.getItem('kb_auth') } catch { return null }
+}
+
+function LoginOverlay({ onLogin }) {
+  const [user, setUser] = useState('')
+  const [pass, setPass] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!user || !pass) return
+    setLoading(true)
+    setError('')
+    const token = btoa(`${user}:${pass}`)
+    try {
+      const res = await fetch(API_URL.replace('/query', '/health'), {
+        headers: { Authorization: `Basic ${token}` },
+      })
+      if (res.ok || res.status === 404) {
+        sessionStorage.setItem('kb_auth', token)
+        onLogin(token)
+      } else {
+        setError('Username หรือ Password ไม่ถูกต้อง')
+      }
+    } catch {
+      setError('เชื่อมต่อ server ไม่ได้')
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="login-overlay">
+      <div className="login-card">
+        <div className="login-logo">🧠</div>
+        <h2>IAM AMS Knowledge Base</h2>
+        <p className="login-sub">กรุณาเข้าสู่ระบบก่อนใช้งาน</p>
+        <form onSubmit={handleSubmit} className="login-form">
+          <input
+            type="text"
+            placeholder="Username"
+            value={user}
+            onChange={(e) => setUser(e.target.value)}
+            autoFocus
+            disabled={loading}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={pass}
+            onChange={(e) => setPass(e.target.value)}
+            disabled={loading}
+          />
+          {error && <p className="login-error">{error}</p>}
+          <button type="submit" disabled={!user || !pass || loading}>
+            {loading ? 'กำลังตรวจสอบ...' : 'เข้าสู่ระบบ'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
 
 const SUGGESTED = [
   'SAP posting error CORM month close solution',
@@ -11,11 +75,14 @@ const SUGGESTED = [
 ]
 
 export default function App() {
+  const [auth, setAuth] = useState(() => getStoredAuth())
   const [question, setQuestion] = useState('')
   const [answer, setAnswer] = useState('')
   const [sources, setSources] = useState([])
   const [status, setStatus] = useState('idle') // idle | searching | streaming | done | error
   const abortRef = useRef(null)
+
+  if (!auth) return <LoginOverlay onLogin={setAuth} />
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -31,11 +98,19 @@ export default function App() {
     try {
       const res = await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${auth}`,
+        },
         body: JSON.stringify({ question: q }),
         signal: abortRef.current.signal,
       })
 
+      if (res.status === 401) {
+        sessionStorage.removeItem('kb_auth')
+        setAuth(null)
+        return
+      }
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
 
       const reader = res.body.getReader()
