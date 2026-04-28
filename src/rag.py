@@ -5,8 +5,27 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-supabase = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"])
+_OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+_SUPABASE_URL = os.environ.get("SUPABASE_URL")
+_SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
+
+_missing = [
+    name
+    for name, value in [
+        ("OPENAI_API_KEY", _OPENAI_API_KEY),
+        ("SUPABASE_URL", _SUPABASE_URL),
+        ("SUPABASE_SERVICE_KEY", _SUPABASE_SERVICE_KEY),
+    ]
+    if not value
+]
+if _missing:
+    raise EnvironmentError(
+        f"Missing required environment variable(s): {', '.join(_missing)}. "
+        "Ensure these are set in your Railway service configuration."
+    )
+
+openai_client = OpenAI(api_key=_OPENAI_API_KEY)
+supabase = create_client(_SUPABASE_URL, _SUPABASE_SERVICE_KEY)
 
 EMBED_MODEL = "text-embedding-3-small"
 CHAT_MODEL = "gpt-4o"
